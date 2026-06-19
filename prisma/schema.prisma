@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  name          String?
+  password      String?
+  role          String        @default("USER") // USER | ADMIN
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  bookmarks     Bookmark[]
+  quizAttempts  QuizAttempt[]
+  readHistory   ReadHistory[]
+}
+
+model Article {
+  id              String        @id @default(cuid())
+  guid            String?       @unique // RSS item guid/link — dedup key for upsert
+  slug            String        @unique
+  headline        String
+  summary         String
+  background      String        @default("")
+  whyItMatters    String        @default("")
+  keyFacts        String        @default("[]") // JSON array stored as string
+  mcqQuestion     String        @default("{}")  // JSON object stored as string
+  mainsQuestion   String        @default("")
+  keywords        String        @default("[]") // JSON array stored as string
+  category        String
+  upscScore       Int           @default(5)
+  readingTime     Int           @default(3) // minutes
+  sourceUrl       String        @default("")
+  sourceName      String        @default("")
+  imageUrl        String        @default("")
+  approved        Boolean       @default(false)
+  featured        Boolean       @default(false)
+  publishedAt     DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  bookmarks       Bookmark[]
+  quizQuestions   QuizQuestion[]
+  readHistory     ReadHistory[]
+  relatedArticles RelatedArticle[] @relation("ArticleRelations")
+  relatedTo       RelatedArticle[] @relation("RelatedTo")
+}
+
+model RelatedArticle {
+  id              String  @id @default(cuid())
+  articleId       String
+  relatedId       String
+  article         Article @relation("ArticleRelations", fields: [articleId], references: [id], onDelete: Cascade)
+  related         Article @relation("RelatedTo", fields: [relatedId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, relatedId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+}
+
+model QuizQuestion {
+  id            String        @id @default(cuid())
+  articleId     String?
+  question      String
+  options       String        // JSON array stored as string
+  correctAnswer Int
+  explanation   String
+  type          String        @default("MCQ") // MCQ | FILL | TRUEFALSE | MATCH
+  createdAt     DateTime      @default(now())
+  article       Article?      @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  attempts      QuizAttempt[]
+}
+
+model QuizAttempt {
+  id             String       @id @default(cuid())
+  userId         String
+  questionId     String
+  selectedAnswer Int
+  correct        Boolean
+  attemptedAt    DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question       QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model ReadHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  articleId String
+  readAt    DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+}

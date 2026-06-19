@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NewsDigest
+
+AI-curated daily current affairs for competitive exam aspirants (UPSC, PCS, SSC, Banking, Defence).
+
+Built with Next.js 16, Prisma + SQLite, Tailwind CSS v4, and Google Gemini AI.
+
+## Features
+
+- **AI-powered news pipeline** — fetches from 7+ RSS feeds, filters, categorizes, and generates structured UPSC content (summary, background, MCQs, Mains questions)
+- **6 Category pages** — India, World, Economy, Science & Tech, Environment, Polity & Governance
+- **Daily Quiz** — 15 MCQs with timer, explanations, and score tracking
+- **Weekly Revision** — Top 10 stories ranked by UPSC relevance
+- **Monthly Magazine** — Category-compiled PDF download
+- **Admin Dashboard** — Review, approve, and manage AI-generated articles
+- **User authentication** — Custom JWT-based auth with admin/user roles
+- **Bookmarks** — Save articles for later
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- A [Google AI API key](https://aistudio.google.com/apikey) (for AI news processing)
+
+### Setup
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Copy environment file and fill in your values
+cp .env.example .env.local
+
+# 3. Push DB schema and seed data
+npm run db:push
+npm run seed
+
+# 4. Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Default seed accounts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Email | Password | Role |
+|-------|----------|------|
+| admin@newsdigest.in | password123 | ADMIN |
+| user@newsdigest.in | password123 | USER |
 
-## Learn More
+The first user registered via `/register` automatically becomes ADMIN.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run seed` | Seed database with sample data |
+| `npm run db:push` | Push schema to database |
+| `npm run db:migrate` | Create and apply migrations |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment Variables
 
-## Deploy on Vercel
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | SQLite database path (default: `file:./dev.db`) |
+| `NEXTAUTH_SECRET` | Yes | Session encryption secret (generate via `openssl rand -base64 32`) |
+| `GOOGLE_AI_API_KEY` | For AI features | Google Gemini API key |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework:** Next.js 16 (App Router), React 19
+- **Database:** SQLite via Prisma + better-sqlite3
+- **Auth:** Custom JWT (jose) + bcryptjs
+- **UI:** Tailwind CSS v4, Lucide React icons
+- **AI:** Google Gemini 1.5 Flash
+- **PDF:** jsPDF + html2canvas
