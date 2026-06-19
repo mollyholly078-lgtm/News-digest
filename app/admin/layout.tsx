@@ -3,45 +3,39 @@ import { LayoutDashboard, FileText, Home } from 'lucide-react'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', minHeight: '100vh', background: 'var(--bg)' }}>
+    <div className="admin-grid">
       {/* Sidebar */}
-      <aside style={{ borderRight: '1px solid var(--border)', background: 'var(--bg-card)', padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+      <aside style={{ borderRight: 'none', borderBottom: '1px solid var(--border)', background: 'var(--bg-card)', padding: '0.75rem 1rem', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ flexShrink: 0 }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
             NewsDigest Admin
           </h2>
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Control Center
-          </span>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+        <nav style={{ display: 'flex', gap: '0.25rem', flex: 1, overflowX: 'auto' }}>
           <Link
             href="/admin"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9375rem', fontWeight: 600 }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.8125rem', fontWeight: 600, whiteSpace: 'nowrap' }}
           >
-            <LayoutDashboard size={18} /> Dashboard
+            <LayoutDashboard size={16} /> Dashboard
           </Link>
           <Link
             href="/admin/articles"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9375rem', fontWeight: 600 }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.8125rem', fontWeight: 600, whiteSpace: 'nowrap' }}
           >
-            <FileText size={18} /> Review Queue
+            <FileText size={16} /> Review Queue
           </Link>
-        </nav>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
           <Link
             href="/"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.875rem' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.8125rem', whiteSpace: 'nowrap', marginLeft: 'auto' }}
           >
-            <Home size={16} /> Exit to Site
+            <Home size={16} /> Site
           </Link>
-        </div>
+        </nav>
       </aside>
 
       {/* Main Content */}
-      <main style={{ padding: '2.5rem 3rem', overflowY: 'auto' }}>
+      <main className="admin-main">
         {children}
       </main>
     </div>

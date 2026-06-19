@@ -37,7 +37,7 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
     <div className="container" style={{ padding: '2rem 1.5rem 4rem' }}>
       {/* Header */}
       <div style={{ borderLeft: `4px solid ${info.color}`, paddingLeft: '1rem', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
           {info.label}
         </h1>
         <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>{info.description}</p>
@@ -67,7 +67,7 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
         })}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr minmax(0, 280px)', gap: '2rem', alignItems: 'start' }}>
+      <div className="sidebar-grid">
         {/* Articles */}
         <div>
           {articles.length === 0 ? (
@@ -85,7 +85,7 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
         </div>
 
         {/* Sidebar */}
-        <aside style={{ position: 'sticky', top: '80px' }}>
+        <aside className="sidebar-sticky">
           <div className="card" style={{ padding: '1.25rem' }}>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Other Categories

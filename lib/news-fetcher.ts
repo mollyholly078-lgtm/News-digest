@@ -1,4 +1,5 @@
 import Parser from 'rss-parser'
+import { NEWS_SOURCES, type NewsSource } from './news-sources'
 
 export interface RawNewsItem {
   guid: string        // RSS item GUID/link — used as dedup key
@@ -11,16 +12,6 @@ export interface RawNewsItem {
 }
 
 const parser = new Parser()
-
-const RSS_FEEDS: { url: string; name: string; category: string }[] = [
-  { url: 'https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3', name: 'PIB', category: 'india' },
-  { url: 'https://www.thehindu.com/news/national/feeder/default.rss', name: 'The Hindu', category: 'india' },
-  { url: 'https://feeds.feedburner.com/ndtvnews-india-news', name: 'NDTV', category: 'india' },
-  { url: 'https://feeds.bbci.co.uk/news/world/asia/india/rss.xml', name: 'BBC India', category: 'india' },
-  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', name: 'BBC World', category: 'world' },
-  { url: 'https://feeds.reuters.com/reuters/INbusinessNews', name: 'Reuters Business', category: 'economy' },
-  { url: 'https://feeds.feedburner.com/ndtvnews-latest', name: 'NDTV Latest', category: 'india' },
-]
 
 const BLOCKED_KEYWORDS = [
   'celebrity', 'bollywood', 'cricket match', 'film', 'movie', 'actress', 'actor',
@@ -63,54 +54,88 @@ export function parsePubDate(item: { isoDate?: string; pubDate?: string }): Date
   return null
 }
 
-export async function fetchNewsFromRSS(): Promise<RawNewsItem[]> {
+/**
+ * Fetch and parse a single RSS feed, returning normalized article objects.
+ * Wraps the entire operation in try/catch so a single failing feed never
+ * crashes the caller — returns an empty array on error.
+ */
+export async function fetchFeed(source: NewsSource): Promise<RawNewsItem[]> {
   const items: RawNewsItem[] = []
-  // Only accept articles published within the last 48 hours
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
 
-  for (const feed of RSS_FEEDS) {
-    try {
-      const parsed = await parser.parseURL(feed.url)
-      for (const item of (parsed.items ?? []).slice(0, 10)) {
-        const headline = item.title ?? ''
-        if (!headline || !isRelevantNews(headline)) continue
+  try {
+    const parsed = await parser.parseURL(source.url)
 
-        const publishedAt = parsePubDate(item)
+    for (const item of (parsed.items ?? []).slice(0, 10)) {
+      const headline = item.title ?? ''
+      if (!headline || !isRelevantNews(headline)) continue
 
-        if (!publishedAt) {
-          // Skip articles with no parseable date — we cannot trust their freshness
-          console.log(`[news-fetcher] Skipping (no pubDate): "${headline}"`)
-          continue
-        }
+      const publishedAt = parsePubDate(item)
 
-        if (publishedAt < cutoff) {
-          // Skip articles older than 48 hours
-          console.log(`[news-fetcher] Skipping (too old, ${publishedAt.toISOString()}): "${headline}"`)
-          continue
-        }
-
-        // Use guid first, fall back to link, then headline+sourceName as last resort
-        const guid = item.guid ?? item.link ?? `${feed.name}::${headline.slice(0, 80)}`
-
-        console.log(`[news-fetcher] Accepted (${publishedAt.toISOString()}): "${headline}"`)
-
-        items.push({
-          guid,
-          headline,
-          content: item.contentSnippet ?? item.content ?? item.summary ?? '',
-          sourceUrl: item.link ?? feed.url,
-          sourceName: feed.name,
-          publishedAt,
-          category: classifyCategory(headline, feed.category),
-        })
+      if (!publishedAt) {
+        console.log(`[news-fetcher] [${source.name}] Skipping (no pubDate): "${headline}"`)
+        continue
       }
-    } catch (err) {
-      // Feed may be unavailable — skip silently in production, log in dev
-      console.warn(`[news-fetcher] Feed failed (${feed.url}):`, err)
+
+      if (publishedAt < cutoff) {
+        console.log(`[news-fetcher] [${source.name}] Skipping (too old, ${publishedAt.toISOString()}): "${headline}"`)
+        continue
+      }
+
+      const guid = item.guid ?? item.link ?? `${source.name}::${headline.slice(0, 80)}`
+
+      items.push({
+        guid,
+        headline,
+        content: item.contentSnippet ?? item.content ?? item.summary ?? '',
+        sourceUrl: item.link ?? source.url,
+        sourceName: source.name,
+        publishedAt,
+        category: classifyCategory(headline, source.category),
+      })
+    }
+  } catch (err) {
+    console.warn(`[news-fetcher] [${source.name}] Feed failed (${source.url}):`, err)
+  }
+
+  return items
+}
+
+/**
+ * Fetch all configured RSS sources in parallel, merge, deduplicate, and log
+ * per-source statistics. Uses Promise.allSettled so one failed feed never
+ * blocks the others.
+ */
+export async function fetchNewsFromRSS(): Promise<RawNewsItem[]> {
+  const results = await Promise.allSettled(
+    NEWS_SOURCES.map((source) => fetchFeed(source))
+  )
+
+  const perSource: { name: string; count: number; failed: boolean }[] = []
+  const allItems: RawNewsItem[] = []
+
+  for (let i = 0; i < results.length; i++) {
+    const source = NEWS_SOURCES[i]
+    const result = results[i]
+
+    if (result.status === 'fulfilled') {
+      allItems.push(...result.value)
+      perSource.push({ name: source.name, count: result.value.length, failed: false })
+    } else {
+      perSource.push({ name: source.name, count: 0, failed: true })
     }
   }
 
-  return deduplicateNews(items)
+  const deduped = deduplicateNews(allItems)
+
+  const logLine = perSource
+    .map((s) => `${s.name}: ${s.count} articles${s.failed ? ' (failed)' : ''}`)
+    .join(' | ')
+
+  console.log(`[news-fetcher] ${logLine}`)
+  console.log(`[news-fetcher] Total fetched: ${allItems.length}, after dedup: ${deduped.length}`)
+
+  return deduped
 }
 
 function deduplicateNews(items: RawNewsItem[]): RawNewsItem[] {

@@ -38,7 +38,13 @@ export default function BreakingNewsPage() {
   const [loading, setLoading] = useState(true)
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL)
 
+  const [refreshingFeeds, setRefreshingFeeds] = useState(false)
+
   const fetchArticles = useCallback(async () => {
+    // Fire RSS fetch in background (don't block article display)
+    setRefreshingFeeds(true)
+    fetch('/api/news/refresh').finally(() => setRefreshingFeeds(false))
+
     try {
       const res = await fetch('/api/news/breaking')
       const data = await res.json()
@@ -97,23 +103,24 @@ export default function BreakingNewsPage() {
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'white', display: 'inline-block' }} />
             Live
           </span>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>Breaking News</h1>
+          <h1 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)' }}>Breaking News</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
           <span>Refreshes in {formatCountdown(countdown)}</span>
           <span>|</span>
           <span>Last: {lastRefresh || '—'}</span>
-          <button onClick={fetchArticles} style={{
-            background: 'var(--accent)', color: 'white', border: 'none',
+          <button onClick={fetchArticles} disabled={refreshingFeeds} style={{
+            background: refreshingFeeds ? 'var(--text-muted)' : 'var(--accent)',
+            color: 'white', border: 'none',
             padding: '0.25rem 0.75rem', borderRadius: '0.375rem',
-            fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
+            fontSize: '0.75rem', fontWeight: 600, cursor: refreshingFeeds ? 'not-allowed' : 'pointer',
           }}>
-            Refresh Now
+            {refreshingFeeds ? 'Fetching RSS…' : 'Refresh Now'}
           </button>
         </div>
       </div>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '2rem' }}>
-        Auto-updates every 30 minutes. {articles.length} stories from across the web.
+        Auto-fetches from 7+ RSS sources every 30 minutes. {articles.length} stories from across the web.
       </p>
 
       {articles.length === 0 ? (

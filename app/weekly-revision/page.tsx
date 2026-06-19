@@ -42,7 +42,7 @@ export default async function WeeklyRevisionPage() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr minmax(0, 320px)', gap: '2rem', alignItems: 'start' }}>
+        <div className="sidebar-grid">
           {/* Main content */}
           <div>
             {/* Top 10 */}
@@ -85,7 +85,7 @@ export default async function WeeklyRevisionPage() {
           </div>
 
           {/* Sidebar */}
-          <aside style={{ position: 'sticky', top: '80px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <aside className="sidebar-sticky" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="card" style={{ padding: '1.25rem' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <BookOpen size={16} style={{ color: 'var(--accent)' }} /> Revision Checklist

@@ -93,7 +93,74 @@ a:hover { color: var(--accent-hover); }
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container { padding: 0 1.5rem; }
+}
+
+/* Responsive sidebar layout — stacks on mobile, side-by-side on tablet+ */
+.sidebar-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 769px) {
+  .sidebar-grid {
+    grid-template-columns: 1fr minmax(0, 280px);
+  }
+}
+
+/* Admin layout — sidebar on top on mobile, side-by-side on tablet+ */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+@media (min-width: 769px) {
+  .admin-grid {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+/* Responsive page header area */
+.page-header {
+  padding: 1.5rem 0 0;
+}
+
+@media (min-width: 640px) {
+  .page-header { padding: 2rem 0 0; }
+}
+
+/* Sticky sidebar */
+.sidebar-sticky {
+  position: static;
+}
+
+@media (min-width: 769px) {
+  .sidebar-sticky {
+    position: sticky;
+    top: 80px;
+  }
+}
+
+/* Admin content padding */
+.admin-main {
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+}
+
+@media (min-width: 640px) {
+  .admin-main { padding: 2rem 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .admin-main { padding: 2.5rem 3rem; }
 }
 
 .card {
