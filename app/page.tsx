@@ -4,7 +4,7 @@ import ArticleCard from '@/components/articles/ArticleCard'
 import { getTodaysTopStories, getApprovedArticles } from '@/lib/articles'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { CATEGORIES } from '@/types'
+import { CATEGORIES, type Article } from '@/types'
 
 export const metadata: Metadata = {
   title: 'NewsDigest — Daily Current Affairs for Competitive Exams',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  const [topStories, recentArticles] = await Promise.all([
+  const [topStories, recentArticles]: [Article[], Article[]] = await Promise.all([
     getTodaysTopStories(6),
     getApprovedArticles({ limit: 8 }),
   ])

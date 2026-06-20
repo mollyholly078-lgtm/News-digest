@@ -20,14 +20,14 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
   if (!VALID.includes(category)) return <div>Category not found</div>
 
   const info = CATEGORIES.find((c) => c.slug === category)!
-  let articles = await getApprovedArticles({ category, limit: 30 })
+  let articles: Article[] = await getApprovedArticles({ category, limit: 30 })
 
   // Filter by topic keyword if specified
   const searchParams = await props.searchParams
   const activeTopic = searchParams?.topic
   if (activeTopic) {
     const q = activeTopic.toLowerCase()
-    articles = articles.filter((a: Article) =>
+    articles = articles.filter((a) =>
       a.keywords.some((k) => k.toLowerCase().includes(q)) ||
       a.headline.toLowerCase().includes(q)
     )
