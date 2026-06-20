@@ -16,17 +16,17 @@ export default function HeroSection() {
         </div>
 
         {/* Headline */}
-        <h1 style={{ fontSize: 'clamp(2.25rem, 5vw, 3.5rem)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.15, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.875rem, 7vw, 3.5rem)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.15, letterSpacing: '-0.03em', marginBottom: '1.25rem', wordBreak: 'break-word' }}>
           Current Affairs,{' '}
           <span style={{ color: 'var(--accent)' }}>Simplified</span>
           <br />for Exam Success
         </h1>
 
         {/* Tagline */}
-        <p style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: '560px', margin: '0 auto 2.5rem' }}>
+        <p style={{ fontSize: 'clamp(0.9375rem, 4vw, 1.25rem)', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: '560px', margin: '0 auto 2.5rem' }}>
           Daily Current Affairs for Competitive Exams — Read in 15 Minutes.
           <br />
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>Designed for UPSC, PCS, SSC, Banking & Defence aspirants.</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Designed for UPSC, PCS, SSC, Banking & Defence aspirants.</span>
         </p>
 
         {/* CTAs */}
