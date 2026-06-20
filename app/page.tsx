@@ -76,7 +76,7 @@ export default async function HomePage() {
 
               {/* Grid */}
               {gridStories.length > 0 && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.25rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
                   {gridStories.map((article) => (
                     <ArticleCard key={article.id} article={article} />
                   ))}
@@ -133,7 +133,7 @@ export default async function HomePage() {
                 View all <ArrowRight size={16} />
               </Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
               {recentArticles.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}

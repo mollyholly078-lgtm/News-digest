@@ -163,7 +163,7 @@ export default function Navbar() {
               color: '#DC2626', whiteSpace: 'nowrap',
               transition: 'all 0.2s',
             }}
-            className="nav-link"
+            className="nav-link hide-mobile"
           >
             <span style={{
               width: '7px', height: '7px', borderRadius: '50%',
