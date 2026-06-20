@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getApprovedArticles } from '@/lib/articles'
 import ArticleCard from '@/components/articles/ArticleCard'
-import { CATEGORIES, type Article } from '@/types'
+import { CATEGORIES } from '@/types'
 import Link from 'next/link'
 
 const VALID = ['india', 'world', 'economy', 'science-technology', 'environment', 'polity-governance']
@@ -20,7 +20,7 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
   if (!VALID.includes(category)) return <div>Category not found</div>
 
   const info = CATEGORIES.find((c) => c.slug === category)!
-  let articles: Article[] = await getApprovedArticles({ category, limit: 30 })
+  let articles = await getApprovedArticles({ category, limit: 30 })
 
   // Filter by topic keyword if specified
   const searchParams = await props.searchParams

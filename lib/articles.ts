@@ -2,9 +2,6 @@ import { prisma } from './prisma'
 import { parseJsonField, slugify } from './utils'
 import type { Article } from '@/types'
 
-// Articles older than this are excluded from all "current" feeds.
-// The home page, category pages, breaking news, etc. only show recent content.
-// Seeded/admin-approved articles are exempt via the `featured` flag bypass.
 const RECENCY_HOURS = 48
 function recentCutoff() {
   return new Date(Date.now() - RECENCY_HOURS * 60 * 60 * 1000)
@@ -15,20 +12,18 @@ export async function getApprovedArticles(options?: {
   limit?: number
   skip?: number
   featured?: boolean
-  /** Pass true to bypass the recency cutoff (e.g. search, bookmarks) */
   allTime?: boolean
-}) {
+}): Promise<Article[]> {
   const { category, limit = 20, skip = 0, featured, allTime = false } = options ?? {}
 
   const where: Record<string, unknown> = { approved: true }
   if (category) where.category = category
   if (featured !== undefined) where.featured = featured
-  // Only show articles published within the recency window unless allTime is requested
   if (!allTime) where.publishedAt = { gte: recentCutoff() }
 
   const articles = await prisma.article.findMany({
     where,
-    orderBy: { publishedAt: 'desc' }, // sort by actual RSS pubDate, not scrape time
+    orderBy: { publishedAt: 'desc' },
     take: limit,
     skip,
   })
@@ -36,13 +31,13 @@ export async function getApprovedArticles(options?: {
   return articles.map(parseArticle)
 }
 
-export async function getArticleBySlug(slug: string) {
+export async function getArticleBySlug(slug: string): Promise<Article | null> {
   const article = await prisma.article.findUnique({ where: { slug } })
   if (!article) return null
   return parseArticle(article)
 }
 
-export async function getRelatedArticles(articleId: string, category: string, limit = 4) {
+export async function getRelatedArticles(articleId: string, category: string, limit = 4): Promise<Article[]> {
   const articles = await prisma.article.findMany({
     where: {
       approved: true,
@@ -56,8 +51,7 @@ export async function getRelatedArticles(articleId: string, category: string, li
   return articles.map(parseArticle)
 }
 
-export async function searchArticles(query: string, filters?: { category?: string }) {
-  // Search is allTime — users may want to find older articles explicitly
+export async function searchArticles(query: string, filters?: { category?: string }): Promise<Article[]> {
   const where: Record<string, unknown> = {
     approved: true,
     OR: [
@@ -76,8 +70,7 @@ export async function searchArticles(query: string, filters?: { category?: strin
   return articles.map(parseArticle)
 }
 
-export async function getTodaysTopStories(limit = 10) {
-  // First try: approved articles within the recency window ranked by upscScore
+export async function getTodaysTopStories(limit = 10): Promise<Article[]> {
   const recent = await prisma.article.findMany({
     where: {
       approved: true,
@@ -87,7 +80,6 @@ export async function getTodaysTopStories(limit = 10) {
     take: limit,
   })
 
-  // Fall back to all-time top stories if no recent articles exist (e.g. fresh install)
   if (recent.length > 0) return recent.map(parseArticle)
 
   const fallback = await prisma.article.findMany({
@@ -98,7 +90,7 @@ export async function getTodaysTopStories(limit = 10) {
   return fallback.map(parseArticle)
 }
 
-export async function getWeeklyTopArticles() {
+export async function getWeeklyTopArticles(): Promise<Article[]> {
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
   const articles = await prisma.article.findMany({
     where: { approved: true, publishedAt: { gte: weekAgo } },
@@ -108,7 +100,7 @@ export async function getWeeklyTopArticles() {
   return articles.map(parseArticle)
 }
 
-export async function getMonthlyArticles() {
+export async function getMonthlyArticles(): Promise<Article[]> {
   const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   const articles = await prisma.article.findMany({
     where: { approved: true, publishedAt: { gte: monthAgo } },

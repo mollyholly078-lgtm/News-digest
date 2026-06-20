@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import type { Article } from '@prisma/client'
 import ArticleQueue from '@/components/admin/ArticleQueue'
 
 export const metadata = {
@@ -11,7 +12,7 @@ export default async function AdminArticlesPage() {
   })
 
   // Format articles for the client component (dates to ISO strings)
-  const formattedArticles = articles.map((art) => ({
+  const formattedArticles = articles.map((art: Article) => ({
     id: art.id,
     headline: art.headline,
     category: art.category,
