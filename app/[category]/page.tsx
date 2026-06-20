@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getApprovedArticles } from '@/lib/articles'
 import ArticleCard from '@/components/articles/ArticleCard'
-import { CATEGORIES } from '@/types'
+import { CATEGORIES, type Article } from '@/types'
 import Link from 'next/link'
 
 const VALID = ['india', 'world', 'economy', 'science-technology', 'environment', 'polity-governance']
@@ -27,7 +27,7 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
   const activeTopic = searchParams?.topic
   if (activeTopic) {
     const q = activeTopic.toLowerCase()
-    articles = articles.filter((a) =>
+    articles = articles.filter((a: Article) =>
       a.keywords.some((k) => k.toLowerCase().includes(q)) ||
       a.headline.toLowerCase().includes(q)
     )
