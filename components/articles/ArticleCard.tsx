@@ -3,6 +3,7 @@ import { Clock, ExternalLink, Star, TrendingUp } from 'lucide-react'
 import { categoryColor, categoryLabel, formatRelativeDate } from '@/lib/utils'
 import type { Article } from '@/types'
 import BookmarkButton from './BookmarkButton'
+import ShareButton from './ShareButton'
 
 interface ArticleCardProps {
   article: Article
@@ -141,7 +142,10 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
             </a>
           )}
         </div>
-        <BookmarkButton articleId={article.id} />
+        <div style={{ display: 'flex', gap: '0.25rem' }}>
+          <ShareButton url={`/article/${article.slug}`} title={article.headline} />
+          <BookmarkButton articleId={article.id} />
+        </div>
       </div>
     </div>
   )

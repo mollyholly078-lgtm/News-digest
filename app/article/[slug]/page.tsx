@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getArticleBySlug, getRelatedArticles } from '@/lib/articles'
 import { categoryColor, categoryLabel, formatDate } from '@/lib/utils'
 import ArticleCard from '@/components/articles/ArticleCard'
+import ShareButton from '@/components/articles/ShareButton'
 import { Clock, ExternalLink, Star, ArrowLeft, CheckCircle } from 'lucide-react'
 
 export async function generateMetadata(
@@ -86,6 +87,7 @@ export default async function ArticlePage(props: { params: Promise<{ slug: strin
                 <ExternalLink size={14} /> {article.sourceName || 'Source'}
               </a>
             )}
+            <ShareButton url={`/article/${article.slug}`} title={article.headline} />
           </div>
         </header>
 
